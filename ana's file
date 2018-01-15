@@ -1,0 +1,26 @@
+void AMyProject2Pawn::MoveXInput(float Val)
+{
+	// Is there any input?
+	bool bHasInput = !FMath::IsNearlyEqual(Val, 0.f);
+	
+
+	float CurrentAcc;
+	if (bHasInput)
+	{
+		CurrentRotation = { -RotationRate * FMath::Sign(Val), 0.0f, 0.0f };
+		CurrentAcc = Val * Acceleration;
+	}
+	else
+	{
+		CurrentRotation = { -RotationRate * FMath::Sign(MyMesh->GetComponentRotation().Pitch), 0.0f, 0.0f };
+		CurrentAcc = -CurrentXSpeed;
+	}
+	
+	FRotator NewRotation = MyMesh->GetComponentRotation() + CurrentRotation;
+
+	MyMesh->SetRelativeRotation({ FMath::Clamp(NewRotation.Pitch, -MaxRotation.Pitch, MaxRotation.Pitch), 0.0f,  MyMesh->GetComponentRotation().Roll });
+
+
+	float NewXSpeed = CurrentXSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
+	CurrentXSpeed = FMath::Clamp(NewXSpeed, -MaxSpeed, MaxSpeed);
+}
